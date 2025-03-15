@@ -34,9 +34,16 @@ public:
 
     ConstraintsVerificationResult() = default;
 
-    bool isValid() const {
+    bool isValid(bool strictGroup = false) const {
+        if(!strictGroup && !satisfiedButNotAssignedSubtaskIds_.empty()) {
+            for (int subtaskId : satisfiedButNotAssignedSubtaskIds_) {
+                string s = StringUtils::toString(subtaskId);
+                string satisfyMessage = "Satisfies subtask " + s + " but is not assigned to it";
+                std::cerr << "\033[1;33mWarning: \033[1;31m" << satisfyMessage << "\033[0m" << endl;
+            }
+        }
         return unsatisfiedConstraintDescriptionsBySubtaskId_.empty() &&
-               satisfiedButNotAssignedSubtaskIds_.empty();
+               (!strictGroup || (strictGroup && satisfiedButNotAssignedSubtaskIds_.empty()));
     }
 
     const map<int, vector<string>>& unsatisfiedConstraintDescriptionsBySubtaskId() const {
